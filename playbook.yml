@@ -1,0 +1,90 @@
+---
+- name: Jumpstart a new macbook
+  hosts: macbook
+  tasks:
+    - name: Setup the timezone
+      shell: 'systemsetup -settimezone {{ TZ }}'
+
+    - name: Install homebrew
+      shell: 'yes | /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"' 
+      args:
+        creates: /usr/local/bin/brew
+      tags: install
+
+    - name: Update homebrew 
+      homebrew:
+        state: latest
+        update_homebrew: yes
+      tags: install, update
+
+    - name: Tap homebrew caskroom/cask
+      homebrew_tap:
+        tap: "caskroom/cask"
+      tags: install, tap
+
+    - name: Installing homebrew applications
+      homebrew:
+        name: "{{applications}}"
+        state: latest
+      tags: install, brew-apps
+
+    - name: Installing homebrew cask applications
+      homebrew_cask:
+        name: "{{cask_applications}}"
+        state: installed
+      tags: install, cask-apps
+
+    - name: Setup zsh with oh-my-zsh
+      git:
+        repo: https://github.com/robbyrussell/oh-my-zsh.git
+        dest: "{{homedir_location}}/.oh-my-zsh"
+      tags: configuration, zsh, ohmyzsh
+
+    - name: Get the dracula theme for oh-my-zsh
+      git:
+        repo: https://github.com/dracula/zsh.git
+        dest: "{{homedir_location}}/.oh-my-zsh_dracula_theme"
+      tags: configuration, zsh, ohmyzsh
+
+    - name: Symlink oh-my-zsh theme
+      file:
+        src: "{{homedir_location}}/.oh-my-zsh_dracula_theme/dracula.zsh-theme"
+        dest: "{{homedir_location}}/.oh-my-zsh/themes/dracula.zsh-theme"
+        state: link
+      tags: configuration, zsh, ohmyzsh
+    
+    - name: Clone my dotfiles repository at a temp location
+      git:
+        repo: https://github.com/ajitabhpandey/ajitabh-dotfiles.git
+        dest: /tmp/dotfiles/
+      tags: configuration, dotfiles
+    
+    - name: Zshrc file
+      copy:
+        src: /tmp/dotfiles/dot-zshrc
+        dest: "{{homedir_location}}/.zshrc"
+      tags: configuration, dotfiles, zsh, ohmyzsh
+
+    - name: Bashrc file
+      copy:
+        src: /tmp/dotfiles/dot-bashrc
+        dest: "{{homedir_location}}/.bashrc"
+      tags: configuration, dotfiles
+
+    - name: Screenrc file
+      copy:
+        src: /tmp/dotfiles/dot-screenrc
+        dest: "{{homedir_location}}/.screenrc"
+      tags: configuration, dotfiles
+    
+    - name: Vimrc file
+      copy:
+        src: /tmp/dotfiles/dot-vimrc
+        dest: "{{homedir_location}}/.vimrc"
+      tags: configuration, dotfiles
+    
+    - name: Cleanup the dotfiles repository from temporary location
+      file:
+        path: /tmp/dotfiles
+        state: absent
+      tags: configuration, dotfiles
