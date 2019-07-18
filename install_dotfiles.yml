@@ -1,0 +1,38 @@
+---
+# Downloads and installs my dotfiles 
+
+  - name: Clone my dotfiles repository at a temp location
+      git:
+        repo: https://github.com/ajitabhpandey/ajitabh-dotfiles.git
+        dest: /tmp/dotfiles/
+      tags: configuration, zsh, bash, screen, vim, dotfiles
+    
+  - name: Zshrc file
+    copy:
+      src: /tmp/dotfiles/dot-zshrc
+      dest: "{{homedir_location}}/.zshrc"
+    tags: configuration, dotfiles, zsh, ohmyzsh
+
+  - name: Bashrc file
+    copy:
+      src: /tmp/dotfiles/dot-bashrc
+      dest: "{{homedir_location}}/.bashrc"
+    tags: configuration, dotfiles
+
+  - name: Screenrc file
+    copy:
+      src: /tmp/dotfiles/dot-screenrc
+      dest: "{{homedir_location}}/.screenrc"
+    tags: configuration, dotfiles
+    
+  - name: Vimrc file
+    copy:
+      src: /tmp/dotfiles/dot-vimrc
+      dest: "{{homedir_location}}/.vimrc"
+    tags: configuration, dotfiles
+    
+  - name: Cleanup the dotfiles repository from temporary location
+    file:
+      path: /tmp/dotfiles
+      state: absent
+    tags: configuration, dotfiles

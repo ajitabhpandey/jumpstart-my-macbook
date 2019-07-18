@@ -1,0 +1,28 @@
+---
+# Configure the Macbook
+  - name: Setup the timezone
+    shell: 'systemsetup -settimezone {{ TZ }}'
+    tags: configure, tz
+
+  - name: Set Default Browser
+    shell: 'open -a {{ DEFAULT_BROWSER }} --args --make-default-browser'
+    tags: configure, browser
+
+  - name: Setup zsh with oh-my-zsh
+    git:
+      repo: https://github.com/robbyrussell/oh-my-zsh.git
+      dest: "{{homedir_location}}/.oh-my-zsh"
+    tags: configuration, zsh, ohmyzsh
+
+  - name: Get the dracula theme for oh-my-zsh
+    git:
+      repo: https://github.com/dracula/zsh.git
+      dest: "{{homedir_location}}/.oh-my-zsh_dracula_theme"
+    tags: configuration, zsh, ohmyzsh
+
+  - name: Symlink oh-my-zsh theme
+    file:
+      src: "{{homedir_location}}/.oh-my-zsh_dracula_theme/dracula.zsh-theme"
+      dest: "{{homedir_location}}/.oh-my-zsh/themes/dracula.zsh-theme"
+      state: link
+    tags: configuration, zsh, ohmyzsh
