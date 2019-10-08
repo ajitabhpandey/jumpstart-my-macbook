@@ -28,7 +28,8 @@
     - name: Installing homebrew cask applications
       homebrew_cask:
         name: "{{cask_applications}}"
-        state: installed
+        state: present
+        install_options: force
       tags: install, cask-apps
 
     - name: Configure Macbook
