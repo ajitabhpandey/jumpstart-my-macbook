@@ -2,10 +2,10 @@
 # Downloads and installs my dotfiles 
 
   - name: Clone my dotfiles repository at a temp location
-      git:
-        repo: https://github.com/ajitabhpandey/ajitabh-dotfiles.git
-        dest: /tmp/dotfiles/
-      tags: configuration, zsh, bash, screen, vim, dotfiles
+    git:
+      repo: https://github.com/ajitabhpandey/ajitabh-dotfiles.git
+      dest: /tmp/dotfiles/
+    tags: configuration, zsh, bash, screen, vim, dotfiles
     
   - name: Zshrc file
     copy:
