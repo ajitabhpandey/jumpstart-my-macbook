@@ -16,7 +16,7 @@
 
     - name: Tap homebrew caskroom/cask
       homebrew_tap:
-        tap: "caskroom/cask"
+        tap: "homebrew/cask"
       tags: install, tap
 
     - name: Installing homebrew applications
