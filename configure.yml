@@ -2,10 +2,11 @@
 # Configure the Macbook
   - name: Setup the timezone
     shell: 'systemsetup -settimezone {{ TZ }}'
+    become: yes
     tags: configure, tz
 
   - name: Set Default Browser
-    shell: 'open -a {{ DEFAULT_BROWSER }} --args --make-default-browser'
+    shell: 'open -a "{{ DEFAULT_BROWSER }}" --args --make-default-browser'
     tags: configure, browser
 
   - name: Setup zsh with oh-my-zsh
