@@ -20,7 +20,7 @@ function install {
     echo "${GREEN}${BOLD}========================"
     echo "Setting up the macbook"
     echo "========================${NORMAL}"
-    return 1
+    
     echo "${BLUE}Installing xcode command line tools...${NORMAL}"
     xcode-select --install
 
