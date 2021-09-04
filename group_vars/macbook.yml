@@ -40,7 +40,6 @@ cask_applications:
   - docker
   - vagrant
   - virtualbox
-  - java
   - shotcut
   - gimp
   - vlc
