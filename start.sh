@@ -1,21 +1,21 @@
 #!/bin/bash
 # Script to jumpstart a macbook with ansible 
 
-function uninstall {
+function uninstall() {
     echo "${RED}WARNING : This will remove homebrew and all applications installed through it"
     echo -n "are you sure you want to do that? [y/n] : ${NORMAL}"
     read confirmation
 
     if [ "$confirmation" == "y" ]; then
-        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)"
-        exit 0
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
+        return 0
     else
         echo "Cancelling Uninstall. No changes were made"
-        exit 0
+        return 0
     fi
 }
 
-function install {
+function install() {
     
     echo "${GREEN}${BOLD}========================"
     echo "Setting up the macbook"
@@ -32,25 +32,30 @@ function install {
     else 
         echo "${BLUE}Python 2 found. Installing pip and ansible globally ${NORMAL}"
         sudo bash -c "curl -s https://bootstrap.pypa.io/pip/2.7/get-pip.py | python"
-        sudo pip install ansible
+        sudo pip install virtualenv
+        virtualenv ansible-virtualenv
+        source ansible-virtualenv/bin/activate
+        pip install ansible
     fi
 
     INSTALLDIR="/tmp/jumpstart-my-macbook-$RANDOM"
     mkdir ${INSTALLDIR}
 
-    git clone https://github.com/ajitabhpandey/jumpstart-my-macbook.git $installdir 
+    git clone https://github.com/ajitabhpandey/jumpstart-my-macbook.git ${INSTALLDIR} 
     if [ ! -d ${INSTALLDIR} ]; then
         echo "${RED}Failed to find ${INSTALLDIR}."
         echo "git clone failed${NORMAL}"
+        deactivate
         return 1
     else
         cd ${INSTALLDIR} 
         ansible-playbook -i ./hosts playbook.yml --verbose
+        deactivate
         return 0
     fi
 }
 
-function initialise {
+function initialise() {
     BLACK=$(tput setaf 0)
     RED=$(tput setaf 1)
     GREEN=$(tput setaf 2)
@@ -83,7 +88,7 @@ function cleanup() {
 }
 
 
-function main {
+function main() {
     local EXIT_VAL=0
     # initialization
     initialise
