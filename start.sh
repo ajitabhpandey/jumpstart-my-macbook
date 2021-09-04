@@ -30,9 +30,10 @@ function install() {
         sudo bash -c "curl -s https://bootstrap.pypa.io/get-pip.py | python"
         sudo pip install ansible
     else 
-        echo "${BLUE}Python 2 found. Installing pip and ansible globally ${NORMAL}"
+        echo "${BLUE}Python 2 found. Installing pip and virtualenv globally${NORMAL}"
         sudo bash -c "curl -s https://bootstrap.pypa.io/pip/2.7/get-pip.py | python"
         sudo pip install virtualenv
+        echo "${BLUE}Activating virtualenv and installing ansible in it.${NORMAL}"
         virtualenv ansible-virtualenv
         source ansible-virtualenv/bin/activate
         pip install ansible
@@ -45,12 +46,11 @@ function install() {
     if [ ! -d ${INSTALLDIR} ]; then
         echo "${RED}Failed to find ${INSTALLDIR}."
         echo "git clone failed${NORMAL}"
-        deactivate
         return 1
     else
         cd ${INSTALLDIR} 
+        echo "${BLUE}Running ansible playbook in verbose mode.${NORMAL}"
         ansible-playbook -i ./hosts playbook.yml --verbose
-        deactivate
         return 0
     fi
 }
@@ -79,6 +79,8 @@ function initialise() {
 
 function cleanup() {
     echo "${YELLOW}Cleaning up....${NORMAL}"
+    echo "${YELLOW}Deactivating virtualenv if being used${NORMAL}"
+    [ -z "${$VIRTUAL_ENV}" ] && deactivate
     if [ ! -d ${INSTALLDIR} ]
     then
         rm -Rfv /tmp/${INSTALLDIR}
@@ -92,6 +94,7 @@ function main() {
     local EXIT_VAL=0
     # initialization
     initialise
+    echo "${BLUE}Initialisation complete.${NORMAL}"
 
     if [ "$1" == "uninstall" ]
     then
