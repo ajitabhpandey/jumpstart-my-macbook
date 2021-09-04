@@ -22,6 +22,14 @@ ansible-playbook -v -i ./hosts playbook.yml --skip-tags install --ask-become-pas
 
 In the above example, I am assuming that you want to skip all the tasks with the install tag. Multiple tags can be specified with a comma.
 
+Alternatively, if you want tasks with certain tags to be used, then
+
+```
+ansible-playbook -v -i ./hosts playbook.yml --tags cask-apps  --ask-become-pass
+```
+
+In the above example, I am assuming that you will only be running tasks with the cask-apps tag. Multiple tags can be specified with a comma.
+
 The list of software installed through homebrew is maintained as variables. To see, or modify this list look at [groups_var/macbook.yml](https://raw.githubusercontent.com/ajitabhpandey/jumpstart-my-macbook/master/master/group_vars/macbook.yml).
 
 _NOTE_ - VirtualBox installtion may give failures as Oracle needs to be accepted as provider by visiting the System Preferences -> Security & Privacy -> General. After that another attempt from command line using

@@ -33,7 +33,6 @@ cask_applications:
   - google-chrome
   - google-backup-and-sync
   - dropbox
-  - google-hangouts
   - firefox
   - slack
   - iterm2
