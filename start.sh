@@ -80,8 +80,8 @@ function initialise() {
 function cleanup() {
     echo "${YELLOW}Cleaning up....${NORMAL}"
     echo "${YELLOW}Deactivating virtualenv if being used${NORMAL}"
-    [ -z "${$VIRTUAL_ENV}" ] && deactivate
-    if [ ! -d ${INSTALLDIR} ]
+    [ -z "${VIRTUAL_ENV}" ] && deactivate
+    if [ -d ${INSTALLDIR} ]
     then
         rm -Rfv /tmp/${INSTALLDIR}
     fi
