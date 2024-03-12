@@ -72,9 +72,24 @@ function initialise() {
     REVERSE=$(tput smso)
     UNDERLINE=$(tput smul)
 
-    # Find the current default python version 
-    PYTHON_VERSION=`python -c 'import sys; version=sys.version_info[:3];print("{0}.{1}.{2}".format(*version))'`
-    export PYTHON_VERSION
+    # Python 2 was EoL. Apple removed the system-provided installation from macOS 11 Big Sur.
+    # Python3 needs to be installed from https://www.python.org/downloads/
+    
+    # Add /usr/local/bin to PATH
+    export PATH=$PATH:/usr/local/bin
+    
+    # Check if python3 is present in PATH
+    if command -v python3 &> /dev/null ; then
+        # Get Python version and set PYTHON_VERSION variable
+        PYTHON_VERSION=$(python3 --version | awk '{print $2}')
+        export PYTHON_VERSION
+        echo "Python 3 is available. Version: $PYTHON_VERSION"
+    else
+        echo "Python 3 is not found in PATH. Please install it from https://www.python.org/downloads/."
+        exit 1
+    fi
+    #PYTHON_VERSION=`python -c 'import sys; version=sys.version_info[:3];print("{0}.{1}.{2}".format(*version))'`
+    
 }
 
 function cleanup() {
