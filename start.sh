@@ -24,10 +24,10 @@ function install() {
     echo "${BLUE}Installing xcode command line tools...${NORMAL}"
     xcode-select --install
 
-    if echo ${PYTHON_VERSION} | grep -q '^Python 3\.'
+    if echo ${PYTHON_VERSION} | grep -q '^3\.'
     then
         echo "${BLUE}Python 3 found. Installing pip and ansible globally${NORMAL}"
-        sudo bash -c "curl -s https://bootstrap.pypa.io/get-pip.py | python"
+        sudo bash -c "curl -s https://bootstrap.pypa.io/get-pip.py | python3"
         sudo pip install ansible
     else 
         echo "${BLUE}Python 2 found. Installing pip and virtualenv globally${NORMAL}"
