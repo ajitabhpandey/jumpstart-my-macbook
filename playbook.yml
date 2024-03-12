@@ -14,10 +14,10 @@
         update_homebrew: yes
       tags: install, update
 
-    - name: Tap homebrew caskroom/cask
-      homebrew_tap:
-        tap: "homebrew/cask"
-      tags: install, tap
+    #- name: Tap homebrew caskroom/cask
+    #  homebrew_tap:
+    #    tap: "homebrew/cask   
+    #  tags: install, tap
 
     - name: Installing homebrew applications
       homebrew:
