@@ -1,6 +1,8 @@
 # jumpstart-my-macbook
 
-Jumpstart my MacBook Using Ansible
+Jumpstart my MacBook Using Ansible. 
+
+After Python 2 EoL, apple removed system-provided installation from macOS 11 Big Sur. Please ensure that you install latest version of python from (https://www.python.org/downloads/)
 
 To setup run the following command :
 
