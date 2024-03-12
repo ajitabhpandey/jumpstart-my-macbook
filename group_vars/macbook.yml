@@ -30,11 +30,7 @@ applications:
 
 # homebrew cask applications
 cask_applications:
-  - google-chrome
-  - google-backup-and-sync
-  - dropbox
-  - firefox
-  - slack
+  - warp
   - iterm2
   - caffeine
   - docker
@@ -46,4 +42,8 @@ cask_applications:
   - lastpass
   - calibre
   - visual-studio-code
-
+  - dropbox
+  - firefox
+  - google-chrome
+  - slack
+  
