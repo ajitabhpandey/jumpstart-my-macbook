@@ -26,13 +26,6 @@ function install() {
     echo "Setting up the macbook"
     echo "========================${NORMAL}"
     
-    echo "${BLUE}Installing xcode command line tools...${NORMAL}"
-    if ! xcode-select -p >/dev/null 2>&1; then
-        xcode-select --install || true
-        echo "${YELLOW}Complete the Xcode Command Line Tools installation if prompted, then rerun this script.${NORMAL}"
-        return 1
-    fi
-
     echo "${BLUE}Using repository at ${SCRIPT_DIR}${NORMAL}"
     cd "${SCRIPT_DIR}"
 
@@ -53,39 +46,53 @@ function install() {
 }
 
 function initialise() {
-    BLACK=$(tput setaf 0)
-    RED=$(tput setaf 1)
-    GREEN=$(tput setaf 2)
-    LIME_YELLOW=$(tput setaf 190)
-    YELLOW=$(tput setaf 3)
-    POWDER_BLUE=$(tput setaf 153)
-    BLUE=$(tput setaf 4)
-    MAGENTA=$(tput setaf 5)
-    CYAN=$(tput setaf 6)
-    WHITE=$(tput setaf 7)
-    BOLD=$(tput bold)
-    NORMAL=$(tput sgr0)
-    BLINK=$(tput blink)
-    REVERSE=$(tput smso)
-    UNDERLINE=$(tput smul)
+    # Colour setup: tput can fail in non-TTY environments (e.g. curl | bash).
+    # Guard every call so set -e cannot exit the script silently.
+    if [ -t 1 ] && command -v tput &>/dev/null; then
+        BLACK=$(tput setaf 0 2>/dev/null || true)
+        RED=$(tput setaf 1 2>/dev/null || true)
+        GREEN=$(tput setaf 2 2>/dev/null || true)
+        LIME_YELLOW=$(tput setaf 190 2>/dev/null || true)
+        YELLOW=$(tput setaf 3 2>/dev/null || true)
+        POWDER_BLUE=$(tput setaf 153 2>/dev/null || true)
+        BLUE=$(tput setaf 4 2>/dev/null || true)
+        MAGENTA=$(tput setaf 5 2>/dev/null || true)
+        CYAN=$(tput setaf 6 2>/dev/null || true)
+        WHITE=$(tput setaf 7 2>/dev/null || true)
+        BOLD=$(tput bold 2>/dev/null || true)
+        NORMAL=$(tput sgr0 2>/dev/null || true)
+        BLINK=$(tput blink 2>/dev/null || true)
+        REVERSE=$(tput smso 2>/dev/null || true)
+        UNDERLINE=$(tput smul 2>/dev/null || true)
+    else
+        BLACK=''; RED=''; GREEN=''; LIME_YELLOW=''; YELLOW=''
+        POWDER_BLUE=''; BLUE=''; MAGENTA=''; CYAN=''; WHITE=''
+        BOLD=''; NORMAL=''; BLINK=''; REVERSE=''; UNDERLINE=''
+    fi
 
-    # Python 2 was EoL. Apple removed the system-provided installation from macOS 11 Big Sur.
     # Use the Homebrew prefix paths so Apple Silicon and Intel both work.
-    
     export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
-    
-    # Check if python3 is present in PATH
-    if command -v python3 &> /dev/null ; then
-        # Get Python version and set PYTHON_VERSION variable
+
+    # Xcode Command Line Tools must be present before python3 is available.
+    # Check here so the error message is meaningful on a fresh Mac.
+    if ! xcode-select -p >/dev/null 2>&1; then
+        echo "Xcode Command Line Tools not found. Triggering installation..."
+        xcode-select --install 2>/dev/null || true
+        echo ""
+        echo "A dialog has appeared asking you to install the Command Line Tools."
+        echo "Complete that installation, then rerun this script."
+        exit 0
+    fi
+
+    # Check if python3 is present in PATH (provided by Xcode CLT on a fresh Mac).
+    if command -v python3 &>/dev/null; then
         PYTHON_VERSION=$(python3 --version | awk '{print $2}')
         export PYTHON_VERSION
         echo "Python 3 is available. Version: $PYTHON_VERSION"
     else
-        echo "Python 3 is not found in PATH. Please install it from https://www.python.org/downloads/."
+        echo "Python 3 is not found in PATH. Please install Xcode Command Line Tools first."
         exit 1
     fi
-    #PYTHON_VERSION=`python -c 'import sys; version=sys.version_info[:3];print("{0}.{1}.{2}".format(*version))'`
-    
 }
 
 function cleanup() {
