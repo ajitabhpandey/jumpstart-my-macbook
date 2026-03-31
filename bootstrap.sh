@@ -10,9 +10,12 @@ REPO_OWNER="ajitabhpandey"
 REPO_NAME="jumpstart-my-macbook"
 
 echo "Detecting default branch for ${REPO_OWNER}/${REPO_NAME}"
-REPO_BRANCH=$(curl -fsSL "https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}" \
-    | grep -o '"default_branch":"[^"]*"' \
-    | cut -d'"' -f4)
+# Use -sSL (not -fsSL) so HTTP errors don't cause curl to exit non-zero.
+# Use grep -oE to handle the space GitHub includes after the colon in JSON.
+# Append || true so a grep miss doesn't trigger set -e.
+REPO_BRANCH=$(curl -sSL "https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}" \
+    | grep -oE '"default_branch"[[:space:]]*:[[:space:]]*"[^"]+"' \
+    | sed 's/.*"\([^"]*\)"$/\1/' || true)
 
 if [ -z "${REPO_BRANCH}" ]; then
     echo "Warning: could not detect default branch, falling back to master"
