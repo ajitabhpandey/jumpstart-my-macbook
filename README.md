@@ -1,49 +1,90 @@
 # jumpstart-my-macbook
 
-Jumpstart my MacBook Using Ansible. 
+Bootstrap a macOS development machine with Ansible and Homebrew.
 
-After Python 2 EoL, apple removed system-provided installation from macOS 11 Big Sur. Please ensure that you install latest version of python from (https://www.python.org/downloads/)
+The bootstrap script creates a local Python virtual environment in python-venv/ansible and installs Ansible there. This keeps the system Python clean and works on current macOS releases, including Apple Silicon.
 
-To setup run the following command :
+The package lists are grouped by purpose in group_vars/macbook.yml, and Ansible collections are pinned in collections/requirements.yml.
 
+## Setup
+
+### First run on a fresh Mac
+
+On a brand-new Mac with no developer tools installed, the bootstrap script will detect that Xcode Command Line Tools are missing and trigger the system installation dialog. **The script will exit after that point.** Once the Xcode Command Line Tools installation has finished, rerun the exact same command to continue with the rest of the bootstrap.
+
+### Option 1: Run without cloning first
+
+If you want a one-shot bootstrap and do not want to install or use git first, run:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ajitabhpandey/jumpstart-my-macbook/HEAD/bootstrap.sh | bash
 ```
-curl -s https://raw.githubusercontent.com/ajitabhpandey/jumpstart-my-macbook/master/start.sh | /bin/bash
+
+This downloads the repository archive to a temporary directory and then runs the normal bootstrap script from there.
+
+### Option 2: Clone the repository and run locally
+
+If you want to rerun the playbook later or keep the local Ansible environment around, clone the repository and run:
+
+```bash
+./start.sh
 ```
 
-To directly install using ansible:
+The bootstrap process will:
 
+- install Xcode Command Line Tools if needed
+- create python-venv/ansible
+- install Ansible into that virtual environment
+- run the playbook from either the checked out repository or a temporary downloaded copy
+
+If you cloned the repository and want to activate the Ansible environment manually:
+
+```bash
+source python-venv/ansible/bin/activate
 ```
+
+To run the playbook directly with the local virtual environment:
+
+```bash
+source python-venv/ansible/bin/activate
+ansible-galaxy collection install -r collections/requirements.yml
 ansible-playbook -v -i ./hosts playbook.yml --ask-become-pass
 ```
 
-If the playbook breaks in between for some reason and you want to restart the same and skip some tags use something as below:
+If the playbook breaks in between and you want to skip install tasks:
 
-```
+```bash
 ansible-playbook -v -i ./hosts playbook.yml --skip-tags install --ask-become-pass
 ```
 
-In the above example, I am assuming that you want to skip all the tasks with the install tag. Multiple tags can be specified with a comma.
+Multiple tags can be specified with a comma.
 
-Alternatively, if you want tasks with certain tags to be used, then
+If you only want the cask tasks:
 
-```
+```bash
 ansible-playbook -v -i ./hosts playbook.yml --tags cask-apps  --ask-become-pass
 ```
 
-In the above example, I am assuming that you will only be running tasks with the cask-apps tag. Multiple tags can be specified with a comma.
+The package lists are maintained in [group_vars/macbook.yml](/Users/a0p011z/repos/jumpstart-my-macbook/group_vars/macbook.yml).
+The Ansible collection requirements are maintained in [collections/requirements.yml](/Users/a0p011z/repos/jumpstart-my-macbook/collections/requirements.yml).
+The current package rationale is documented in [docs/packages.md](/Users/a0p011z/repos/jumpstart-my-macbook/docs/packages.md).
 
-The list of software installed through homebrew is maintained as variables. To see, or modify this list look at [groups_var/macbook.yml](https://raw.githubusercontent.com/ajitabhpandey/jumpstart-my-macbook/master/master/group_vars/macbook.yml).
+## Notes
 
-_NOTE_ - VirtualBox installtion may give failures as Oracle needs to be accepted as provider by visiting the System Preferences -> Security & Privacy -> General. After that another attempt from command line using
+- The playbook now uses UTM and OrbStack instead of VirtualBox, Vagrant, and Docker Desktop for a more current Apple Silicon-friendly workflow.
+- Homebrew can live in /opt/homebrew on Apple Silicon or /usr/local on Intel. The playbook checks both locations.
+- The Homebrew Ansible modules come from the community.general collection declared in collections/requirements.yml.
 
+## Uninstall
+
+If you want to remove Homebrew and the applications installed through it from a local checkout, run:
+
+```bash
+./start.sh uninstall
 ```
-brew cask install virtualbox
-```
 
-#### Uninstall
+If you are using the curl-based bootstrap flow:
 
-If you want to undo all the changes that the script did, run the following -
-
-```
-start.sh uninstall
+```bash
+curl -fsSL https://raw.githubusercontent.com/ajitabhpandey/jumpstart-my-macbook/HEAD/bootstrap.sh | bash -s -- uninstall
 ```

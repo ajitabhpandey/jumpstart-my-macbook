@@ -1,6 +1,11 @@
 #!/bin/bash
 # Script to jumpstart a macbook with ansible 
 
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VENV_DIR="${SCRIPT_DIR}/python-venv/ansible"
+
 function uninstall() {
     echo "${RED}WARNING : This will remove homebrew and all applications installed through it"
     echo -n "are you sure you want to do that? [y/n] : ${NORMAL}"
@@ -22,37 +27,29 @@ function install() {
     echo "========================${NORMAL}"
     
     echo "${BLUE}Installing xcode command line tools...${NORMAL}"
-    xcode-select --install
-
-    if echo ${PYTHON_VERSION} | grep -q '^3\.'
-    then
-        echo "${BLUE}Python 3 found. Installing pip and ansible globally${NORMAL}"
-        sudo bash -c "curl -s https://bootstrap.pypa.io/get-pip.py | python3"
-        sudo pip install ansible
-    else 
-        echo "${BLUE}Python 2 found. Installing pip and virtualenv globally${NORMAL}"
-        sudo bash -c "curl -s https://bootstrap.pypa.io/pip/2.7/get-pip.py | python"
-        sudo pip install virtualenv
-        echo "${BLUE}Activating virtualenv and installing ansible in it.${NORMAL}"
-        virtualenv ansible-virtualenv
-        source ansible-virtualenv/bin/activate
-        pip install ansible
-    fi
-
-    INSTALLDIR="/tmp/jumpstart-my-macbook-$RANDOM"
-    mkdir ${INSTALLDIR}
-
-    git clone https://github.com/ajitabhpandey/jumpstart-my-macbook.git ${INSTALLDIR} 
-    if [ ! -d ${INSTALLDIR} ]; then
-        echo "${RED}Failed to find ${INSTALLDIR}."
-        echo "git clone failed${NORMAL}"
+    if ! xcode-select -p >/dev/null 2>&1; then
+        xcode-select --install || true
+        echo "${YELLOW}Complete the Xcode Command Line Tools installation if prompted, then rerun this script.${NORMAL}"
         return 1
-    else
-        cd ${INSTALLDIR} 
-        echo "${BLUE}Running ansible playbook in verbose mode.${NORMAL}"
-        ansible-playbook -i ./hosts playbook.yml --verbose
-        return 0
     fi
+
+    echo "${BLUE}Using repository at ${SCRIPT_DIR}${NORMAL}"
+    cd "${SCRIPT_DIR}"
+
+    echo "${BLUE}Creating Python virtual environment in python-venv/ansible${NORMAL}"
+    mkdir -p "${SCRIPT_DIR}/python-venv"
+    python3 -m venv "${VENV_DIR}"
+    # shellcheck disable=SC1091
+    source "${VENV_DIR}/bin/activate"
+
+    echo "${BLUE}Installing Ansible in the virtual environment${NORMAL}"
+    python -m pip install --upgrade pip
+    python -m pip install ansible
+    ansible-galaxy collection install -r "${SCRIPT_DIR}/collections/requirements.yml"
+
+    echo "${BLUE}Running ansible playbook in verbose mode.${NORMAL}"
+    ansible-playbook -i "${SCRIPT_DIR}/hosts" "${SCRIPT_DIR}/playbook.yml" --verbose
+    return 0
 }
 
 function initialise() {
@@ -73,10 +70,9 @@ function initialise() {
     UNDERLINE=$(tput smul)
 
     # Python 2 was EoL. Apple removed the system-provided installation from macOS 11 Big Sur.
-    # Python3 needs to be installed from https://www.python.org/downloads/
+    # Use the Homebrew prefix paths so Apple Silicon and Intel both work.
     
-    # Add /usr/local/bin to PATH
-    export PATH=$PATH:/usr/local/bin
+    export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
     
     # Check if python3 is present in PATH
     if command -v python3 &> /dev/null ; then
@@ -95,10 +91,8 @@ function initialise() {
 function cleanup() {
     echo "${YELLOW}Cleaning up....${NORMAL}"
     echo "${YELLOW}Deactivating virtualenv if being used${NORMAL}"
-    [ -z "${VIRTUAL_ENV}" ] && deactivate
-    if [ -d ${INSTALLDIR} ]
-    then
-        rm -Rfv /tmp/${INSTALLDIR}
+    if [ -n "${VIRTUAL_ENV:-}" ]; then
+        deactivate
     fi
     echo "${YELLOW}${BLINK}Cleanup complete. Please handle any error manually...${NORMAL}"
     return
@@ -107,13 +101,16 @@ function cleanup() {
 
 function main() {
     local EXIT_VAL=0
+    local ACTION="${1:-}"
     # initialization
     initialise
     echo "${BLUE}Initialisation complete.${NORMAL}"
 
-    if [ "$1" == "uninstall" ]
+    if [ "${ACTION}" == "uninstall" ]
     then
         uninstall
+        cleanup
+        exit 0
     fi
 
     if install

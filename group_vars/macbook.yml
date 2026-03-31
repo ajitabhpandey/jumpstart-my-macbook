@@ -2,47 +2,61 @@
 # list of applications to install
 homedir_location: "{{ lookup('env','HOME') }}"
 
-# homebrew applications
-applications:
-  - autojump
-  - git
-  - tree
-  - httpie
-  - curl
-  - wget
-  - kubectl
-  - kubernetes-helm
-  - zsh
-  - go
-  - vim
-  - hugo
-  - packer
-  - neovim
-  - ag 
-  - ctags
-  - terraform
-  - ffmpeg
-  - imagemagick
-  - nmap
-  - node
-  - python3
-  - php
+# Homebrew formulas grouped by purpose for easier maintenance.
+brew_formula_groups:
+  shell:
+    - zoxide
+    - zsh
+  core_cli:
+    - git
+    - tree
+    - httpie
+    - curl
+    - wget
+    - ripgrep
+    - universal-ctags
+    - nmap
+  cloud:
+    - kubectl
+    - helm
+    - terraform
+    - packer
+  languages:
+    - go
+    - node
+    - python
+    - php
+  editors_and_sites:
+    - vim
+    - neovim
+    - hugo
+  media:
+    - ffmpeg
+    - imagemagick
 
-# homebrew cask applications
-cask_applications:
-  - warp
-  - iterm2
-  - caffeine
-  - docker
-  - vagrant
-  - shotcut
-  - gimp
-  - vlc
-  - lastpass
-  - calibre
-  - visual-studio-code
-  - dropbox
-  - firefox
-  - google-chrome
-  - slack
+brew_formulas: "{{ brew_formula_groups | dict2items | map(attribute='value') | flatten }}"
+
+# Homebrew casks grouped by purpose for easier maintenance.
+brew_cask_groups:
+  terminals_and_browsers:
+    - warp
+    - iterm2
+    - firefox
+    - google-chrome
+  system_tools:
+    - amphetamine
+    - bitwarden
+    - dropbox
+    - visual-studio-code
+    - slack
+  virtualization:
+    - orbstack
+    - utm
+  media_and_reading:
+    - shotcut
+    - gimp
+    - vlc
+    - calibre
+
+brew_casks: "{{ brew_cask_groups | dict2items | map(attribute='value') | flatten }}"
   

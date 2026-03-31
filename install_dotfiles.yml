@@ -1,38 +1,49 @@
 ---
 # Downloads and installs my dotfiles 
 
+  - name: Create a temporary directory for dotfiles
+    ansible.builtin.tempfile:
+      state: directory
+      suffix: dotfiles
+    register: dotfiles_tempdir
+    tags: configuration, zsh, bash, screen, vim, dotfiles
+
   - name: Clone my dotfiles repository at a temp location
-    git:
+    ansible.builtin.git:
       repo: https://github.com/ajitabhpandey/ajitabh-dotfiles.git
-      dest: /tmp/dotfiles/
+      dest: "{{ dotfiles_tempdir.path }}"
     tags: configuration, zsh, bash, screen, vim, dotfiles
     
   - name: Zshrc file
-    copy:
-      src: /tmp/dotfiles/dot-zshrc
+    ansible.builtin.copy:
+      src: "{{ dotfiles_tempdir.path }}/dot-zshrc"
       dest: "{{homedir_location}}/.zshrc"
+      remote_src: true
     tags: configuration, dotfiles, zsh, ohmyzsh
 
   - name: Bashrc file
-    copy:
-      src: /tmp/dotfiles/dot-bashrc
+    ansible.builtin.copy:
+      src: "{{ dotfiles_tempdir.path }}/dot-bashrc"
       dest: "{{homedir_location}}/.bashrc"
+      remote_src: true
     tags: configuration, dotfiles
 
   - name: Screenrc file
-    copy:
-      src: /tmp/dotfiles/dot-screenrc
+    ansible.builtin.copy:
+      src: "{{ dotfiles_tempdir.path }}/dot-screenrc"
       dest: "{{homedir_location}}/.screenrc"
+      remote_src: true
     tags: configuration, dotfiles
     
   - name: Vimrc file
-    copy:
-      src: /tmp/dotfiles/dot-vimrc
+    ansible.builtin.copy:
+      src: "{{ dotfiles_tempdir.path }}/dot-vimrc"
       dest: "{{homedir_location}}/.vimrc"
+      remote_src: true
     tags: configuration, dotfiles
     
   - name: Cleanup the dotfiles repository from temporary location
-    file:
-      path: /tmp/dotfiles
+    ansible.builtin.file:
+      path: "{{ dotfiles_tempdir.path }}"
       state: absent
     tags: configuration, dotfiles

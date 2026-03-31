@@ -1,40 +1,60 @@
 ---
 - name: Jumpstart a new macbook
   hosts: macbook
-  tasks:
-    - name: Install homebrew
-      shell: 'yes | /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
-      args:
-        creates: /usr/local/bin/brew
+  gather_facts: true
+  collections:
+    - community.general
+  vars:
+    homebrew_paths:
+      - /opt/homebrew/bin
+      - /usr/local/bin
+
+  pre_tasks:
+    - name: Check Apple Silicon Homebrew path
+      ansible.builtin.stat:
+        path: /opt/homebrew/bin/brew
+      register: brew_opt_homebrew
       tags: install
 
-    - name: Update homebrew 
-      homebrew:
-        state: latest
-        update_homebrew: yes
+    - name: Check Intel Homebrew path
+      ansible.builtin.stat:
+        path: /usr/local/bin/brew
+      register: brew_usr_local
+      tags: install
+
+    - name: Install Homebrew
+      ansible.builtin.shell: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      when: not brew_opt_homebrew.stat.exists and not brew_usr_local.stat.exists
+      changed_when: true
+      tags: install
+
+    - name: Update Homebrew
+      community.general.homebrew:
+        update_homebrew: true
+        path: "{{ homebrew_paths }}"
       tags: install, update
 
-    #- name: Tap homebrew caskroom/cask
-    #  homebrew_tap:
-    #    tap: "homebrew/cask   
-    #  tags: install, tap
+  tasks:
 
-    - name: Installing homebrew applications
-      homebrew:
-        name: "{{applications}}"
-        state: latest
+    - name: Install Homebrew formulas
+      community.general.homebrew:
+        name: "{{ brew_formulas }}"
+        state: present
+        path: "{{ homebrew_paths }}"
       tags: install, brew-apps
 
-    - name: Installing homebrew cask applications
-      homebrew_cask:
-        name: "{{cask_applications}}"
+    - name: Install Homebrew cask applications
+      community.general.homebrew_cask:
+        name: "{{ brew_casks }}"
         state: present
-        install_options: force
+        path: "{{ homebrew_paths }}"
       tags: install, cask-apps
 
     - name: Configure Macbook
-      include_tasks: configure.yml
+      ansible.builtin.include_tasks: configure.yml
+      tags: configure
     
     - name: Install Dotfiles
-      include_tasks: install_dotfiles.yml
+      ansible.builtin.include_tasks: install_dotfiles.yml
+      tags: dotfiles
     

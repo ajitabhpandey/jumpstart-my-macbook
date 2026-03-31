@@ -1,28 +1,24 @@
 ---
 # Configure the Macbook
   - name: Setup the timezone
-    shell: 'systemsetup -settimezone {{ TZ }}'
+    ansible.builtin.command: systemsetup -settimezone {{ TZ }}
     become: yes
     tags: configure, tz
 
-  - name: Set Default Browser
-    shell: 'open -a "{{ DEFAULT_BROWSER }}" --args --make-default-browser'
-    tags: configure, browser
-
   - name: Setup zsh with oh-my-zsh
-    git:
-      repo: https://github.com/robbyrussell/oh-my-zsh.git
+    ansible.builtin.git:
+      repo: https://github.com/ohmyzsh/ohmyzsh.git
       dest: "{{homedir_location}}/.oh-my-zsh"
     tags: configuration, zsh, ohmyzsh
 
   - name: Get the dracula theme for oh-my-zsh
-    git:
+    ansible.builtin.git:
       repo: https://github.com/dracula/zsh.git
       dest: "{{homedir_location}}/.oh-my-zsh_dracula_theme"
     tags: configuration, zsh, ohmyzsh
 
   - name: Symlink oh-my-zsh theme
-    file:
+    ansible.builtin.file:
       src: "{{homedir_location}}/.oh-my-zsh_dracula_theme/dracula.zsh-theme"
       dest: "{{homedir_location}}/.oh-my-zsh/themes/dracula.zsh-theme"
       state: link
