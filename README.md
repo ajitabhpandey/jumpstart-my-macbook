@@ -35,6 +35,7 @@ The bootstrap process will:
 - install Xcode Command Line Tools if needed
 - create python-venv/ansible
 - install Ansible into that virtual environment
+- prompt once for your local sudo password to cache credentials for Homebrew installation
 - run the playbook from either the checked out repository or a temporary downloaded copy
 
 If you cloned the repository and want to activate the Ansible environment manually:
