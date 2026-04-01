@@ -20,7 +20,6 @@ brew_formula_groups:
     - kubectl
     - helm
     - terraform
-    - packer
   languages:
     - go
     - node

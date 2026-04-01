@@ -22,7 +22,6 @@ This document summarizes the Homebrew formulas and casks included in this reposi
 - kubectl: Kubernetes command-line client. Homepage: https://kubernetes.io/docs/reference/kubectl/
 - helm: Kubernetes package manager. Homepage: https://helm.sh/
 - terraform: infrastructure as code CLI. Homepage: https://developer.hashicorp.com/terraform
-- packer: image builder for cloud and virtual machine artifacts. Homepage: https://developer.hashicorp.com/packer
 
 ### Languages and editors
 
