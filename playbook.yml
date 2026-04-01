@@ -4,10 +4,6 @@
   gather_facts: true
   collections:
     - community.general
-  vars:
-    homebrew_paths:
-      - /opt/homebrew/bin
-      - /usr/local/bin
 
   pre_tasks:
     - name: Check Apple Silicon Homebrew path
@@ -34,10 +30,34 @@
       changed_when: true
       tags: install
 
+    - name: Refresh Apple Silicon Homebrew path check
+      ansible.builtin.stat:
+        path: /opt/homebrew/bin/brew
+      register: brew_opt_homebrew
+      tags: install
+
+    - name: Refresh Intel Homebrew path check
+      ansible.builtin.stat:
+        path: /usr/local/bin/brew
+      register: brew_usr_local
+      tags: install
+
+    - name: Determine active Homebrew binary path
+      ansible.builtin.set_fact:
+        homebrew_path: "{{ '/opt/homebrew/bin' if brew_opt_homebrew.stat.exists else '/usr/local/bin' }}"
+      tags: install, update
+
+    - name: Ensure Homebrew was installed successfully
+      ansible.builtin.assert:
+        that:
+          - brew_opt_homebrew.stat.exists or brew_usr_local.stat.exists
+        fail_msg: Homebrew binary not found at /opt/homebrew/bin/brew or /usr/local/bin/brew.
+      tags: install
+
     - name: Update Homebrew
       community.general.homebrew:
         update_homebrew: true
-        path: "{{ homebrew_paths }}"
+        path: "{{ homebrew_path }}"
       tags: install, update
 
   tasks:
@@ -46,14 +66,14 @@
       community.general.homebrew:
         name: "{{ brew_formulas }}"
         state: present
-        path: "{{ homebrew_paths }}"
+        path: "{{ homebrew_path }}"
       tags: install, brew-apps
 
     - name: Install Homebrew cask applications
       community.general.homebrew_cask:
         name: "{{ brew_casks }}"
         state: present
-        path: "{{ homebrew_paths }}"
+        path: "{{ homebrew_path }}"
       tags: install, cask-apps
 
     - name: Configure Macbook
