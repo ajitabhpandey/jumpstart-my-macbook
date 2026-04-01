@@ -48,8 +48,8 @@ function install() {
         return 1
     fi
 
-    echo "${BLUE}Running ansible playbook in verbose mode.${NORMAL}"
-    ansible-playbook -i "${SCRIPT_DIR}/hosts" "${SCRIPT_DIR}/playbook.yml" --verbose
+    echo "${BLUE}Running ansible playbook in verbose mode (will prompt for sudo when needed).${NORMAL}"
+    ansible-playbook -i "${SCRIPT_DIR}/hosts" "${SCRIPT_DIR}/playbook.yml" --verbose --ask-become-pass
     return 0
 }
 
