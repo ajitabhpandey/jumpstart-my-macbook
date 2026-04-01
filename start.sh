@@ -40,6 +40,14 @@ function install() {
     python -m pip install ansible
     ansible-galaxy collection install -r "${SCRIPT_DIR}/collections/requirements.yml"
 
+    # Homebrew's installer may require sudo and cannot always prompt cleanly
+    # when invoked from a non-interactive Ansible task. Prompt once here.
+    echo "${BLUE}Validating sudo access for install tasks${NORMAL}"
+    if ! sudo -v; then
+        echo "${RED}Unable to obtain sudo credentials. Cannot continue.${NORMAL}"
+        return 1
+    fi
+
     echo "${BLUE}Running ansible playbook in verbose mode.${NORMAL}"
     ansible-playbook -i "${SCRIPT_DIR}/hosts" "${SCRIPT_DIR}/playbook.yml" --verbose
     return 0

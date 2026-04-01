@@ -22,6 +22,12 @@
       register: brew_usr_local
       tags: install
 
+    - name: Ensure sudo timestamp is available for Homebrew install
+      ansible.builtin.command: sudo -n true
+      changed_when: false
+      when: not brew_opt_homebrew.stat.exists and not brew_usr_local.stat.exists
+      tags: install
+
     - name: Install Homebrew
       ansible.builtin.shell: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
       when: not brew_opt_homebrew.stat.exists and not brew_usr_local.stat.exists
