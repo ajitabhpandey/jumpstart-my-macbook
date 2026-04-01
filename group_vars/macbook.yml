@@ -46,7 +46,6 @@ brew_cask_groups:
     - keepingyouawake
     - bitwarden
     - visual-studio-code
-    - slack
   virtualization:
     - orbstack
     - utm
