@@ -45,7 +45,6 @@ brew_cask_groups:
   system_tools:
     - keepingyouawake
     - bitwarden
-    - dropbox
     - visual-studio-code
     - slack
   virtualization:
