@@ -49,7 +49,7 @@ This document summarizes the Homebrew formulas and casks included in this reposi
 
 ### System tools
 
-- amphetamine: prevents sleep and display idle when needed. Replacement for caffeine. Homepage: https://apps.apple.com/app/amphetamine/id937984704
+- keepingyouawake: menu bar utility to prevent system sleep while running tasks. Homepage: https://github.com/newmarcel/KeepingYouAwake
 - bitwarden: password manager. Replacement for LastPass. Homepage: https://bitwarden.com/
 - dropbox: file synchronization client. Homepage: https://www.dropbox.com/
 - visual-studio-code: code editor and IDE. Homepage: https://code.visualstudio.com/
@@ -73,5 +73,5 @@ This document summarizes the Homebrew formulas and casks included in this reposi
 - ag was replaced with ripgrep because ripgrep is faster and better integrated with current developer tooling.
 - ctags was replaced with universal-ctags because the original ctags package is not the preferred maintained implementation.
 - Docker Desktop, Vagrant, and VirtualBox were removed in favor of OrbStack and UTM, which are a better fit for current macOS and Apple Silicon workflows.
-- caffeine was replaced with amphetamine.
+- caffeine was replaced with keepingyouawake.
 - lastpass was replaced with bitwarden, mostly due to high number of security issues with lastpass.

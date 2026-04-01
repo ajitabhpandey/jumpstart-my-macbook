@@ -43,7 +43,7 @@ brew_cask_groups:
     - firefox
     - google-chrome
   system_tools:
-    - amphetamine
+    - keepingyouawake
     - bitwarden
     - dropbox
     - visual-studio-code
