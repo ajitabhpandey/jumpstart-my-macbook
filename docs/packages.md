@@ -51,9 +51,7 @@ This document summarizes the Homebrew formulas and casks included in this reposi
 
 - keepingyouawake: menu bar utility to prevent system sleep while running tasks. Homepage: https://github.com/newmarcel/KeepingYouAwake
 - bitwarden: password manager. Replacement for LastPass. Homepage: https://bitwarden.com/
-- dropbox: file synchronization client. Homepage: https://www.dropbox.com/
 - visual-studio-code: code editor and IDE. Homepage: https://code.visualstudio.com/
-- slack: team communication client. Homepage: https://slack.com/
 
 ### Virtualization
 
